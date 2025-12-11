@@ -1,0 +1,200 @@
+import {
+  AlignLeft,
+  DollarSign,
+  FolderPlus,
+  Home,
+  Image,
+  MapPin,
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
+import { useAuth } from "../../hooks/useAuth";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+
+const AddProperty = () => {
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
+
+  const handleAddProperty = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const postedData = new Date().toISOString();
+    const newProperty = {
+      name: e.target.name.value,
+      description: e.target.description.value,
+      category: e.target.category.value,
+      location: e.target.location.value,
+      price: parseFloat(e.target.price.value),
+      image: e.target.image.value,
+      owner_name: user.displayName,
+      owner_email: user.email,
+      owner_photoURL: user.photoURL,
+      postedDate: postedData,
+    };
+
+    axiosSecure
+      .post("/property", newProperty)
+      .then(() => {
+        toast.success("Property added successfully!");
+        navigate("/all-properties");
+        form.reset();
+      })
+      .catch((error) => {
+        console.error("Error adding property:", error);
+        if (error.response) {
+          console.error("Server response data:", error.response.data);
+          console.error("Server response status:", error.response.status);
+        }
+        toast.error(
+          `Something went wrong: ${
+            error.response?.data?.message || error.message
+          }`
+        );
+      });
+  };
+
+  return (
+    <section className="bg-base-100 min-h-screen py-14">
+      <div className="max-w-4xl mx-auto bg-base-200 rounded-2xl shadow-md p-8 md:p-10 border ">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-[#0F5660] mb-2">
+            Add New Property
+          </h2>
+          <p className="text-gray-500">
+            Fill in the details below to add your property listing to HomeNest.
+          </p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleAddProperty} className="space-y-6">
+          {/* Property Name */}
+          <div className="form-control">
+            <label className="label font-medium text-gray-700 flex items-center gap-2">
+              <Home className="w-4 h-4 text-[#0F5660]" /> Property Name
+            </label>
+            <input
+              required
+              name="name"
+              type="text"
+              placeholder="e.g. Bashundhara Family Duplex"
+              className="input input-bordered w-full focus:ring-2 focus:ring-[#0F5660] focus:border-[#0F5660]"
+            />
+          </div>
+
+          {/* Description */}
+          <div className="form-control">
+            <label className="label font-medium text-gray-700 flex items-center gap-2">
+              <AlignLeft className="w-4 h-4 text-[#0F5660]" /> Description
+            </label>
+            <textarea
+              required
+              name="description"
+              placeholder="Write a short description about your property..."
+              className="textarea textarea-bordered h-28 w-full focus:ring-2 focus:ring-[#0F5660] focus:border-[#0F5660]"
+            ></textarea>
+          </div>
+
+          {/* Category Dropdown */}
+          <div className="form-control">
+            <label className="label font-medium text-gray-700 flex items-center gap-2">
+              <FolderPlus className="w-4 h-4 text-[#0F5660]" /> Category
+            </label>
+            <select
+              required
+              name="category"
+              defaultValue=""
+              className="select select-bordered w-full focus:ring-2 focus:ring-[#0F5660] focus:border-[#0F5660]"
+            >
+              <option value="" disabled>
+                Choose a category
+              </option>
+              <option value="Rent">Rent</option>
+              <option value="Sale">Sale</option>
+              <option value="Commercial">Commercial</option>
+              <option value="Land">Land</option>
+            </select>
+          </div>
+
+          {/* Price */}
+          <div className="form-control">
+            <label className="label font-medium text-gray-700 flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-[#0F5660]" /> Price (৳)
+            </label>
+            <input
+              required
+              name="price"
+              type="number"
+              placeholder="e.g. 30000"
+              className="input input-bordered w-full focus:ring-2 focus:ring-[#0F5660] focus:border-[#0F5660]"
+            />
+          </div>
+
+          {/* Location */}
+          <div className="form-control">
+            <label className="label font-medium text-gray-700 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-[#0F5660]" /> Location
+            </label>
+            <input
+              required
+              name="location"
+              type="text"
+              placeholder="e.g. Bashundhara, Dhaka"
+              className="input input-bordered w-full focus:ring-2 focus:ring-[#0F5660] focus:border-[#0F5660]"
+            />
+          </div>
+
+          {/* Image URL */}
+          <div className="form-control">
+            <label className="label font-medium text-gray-700 flex items-center gap-2">
+              <Image className="w-4 h-4 text-[#0F5660]" /> Image URL
+            </label>
+            <input
+              required
+              name="image"
+              type="text"
+              placeholder="https://your-image-link.com"
+              className="input input-bordered w-full focus:ring-2 focus:ring-[#0F5660] focus:border-[#0F5660]"
+            />
+          </div>
+
+          {/* User Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <div className="form-control">
+              <label className="label font-medium text-gray-700">
+                User Name
+              </label>
+              <input
+                type="text"
+                readOnly
+                defaultValue={user.displayName}
+                className="input input-bordered w-full bg-base-100 cursor-not-allowed"
+              />
+            </div>
+            <div className="form-control">
+              <label className="label font-medium text-gray-700">
+                User Email
+              </label>
+              <input
+                type="email"
+                readOnly
+                defaultValue={user.email}
+                className="input input-bordered w-full bg-base-100 cursor-not-allowed"
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="mt-8 text-center">
+            <button className="btn bg-[#0F5660] hover:bg-[#134a51] text-white font-semibold text-lg px-10">
+              Add Property
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  );
+};
+
+export default AddProperty;
