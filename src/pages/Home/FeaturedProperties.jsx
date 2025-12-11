@@ -13,7 +13,19 @@ const FeaturedProperties = () => {
   useEffect(() => {
     axiosInstance
       .get("/latest-properties")
-      .then((data) => setProperties(data.data));
+      .then((res) => {
+        const payload = res?.data;
+        const normalizedProperties = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+          ? payload.data
+          : [];
+        setProperties(normalizedProperties);
+      })
+      .catch(() => {
+        // Fallback to empty list on error so UI doesn't crash
+        setProperties([]);
+      });
   }, []);
 
   return (
@@ -45,9 +57,10 @@ const FeaturedProperties = () => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-        {properties.map((property) => (
-          <FeaturedPropertiesCard key={property._id} property={property} />
-        ))}
+        {Array.isArray(properties) &&
+          properties.map((property) => (
+            <FeaturedPropertiesCard key={property._id} property={property} />
+          ))}
       </div>
     </div>
   );
