@@ -1,5 +1,5 @@
 import { Facebook, TwitchIcon, Twitter } from "lucide-react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import logo from "../assets/log.png";
 const Footer = () => {
   return (
